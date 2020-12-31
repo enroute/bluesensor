@@ -36,11 +36,11 @@ public class BleEngine {
     private static final String TAG = BleEngine.class.getSimpleName();
 
     //public static final UUID BT_UUID = UUID.fromString("ddaa7f9e-c87e-44dc-aef1-ae53909b27b9");
-    public static final UUID BT_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+    //public static final UUID BT_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     //public static final UUID BT_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     // GATT service UUID
-    public static String HEART_RATE_MEASUREMENT = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    //public static String HEART_RATE_MEASUREMENT = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
     private Context context;
     private Handler handler;

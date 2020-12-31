@@ -86,7 +86,8 @@ public class OscilloscopeView extends SurfaceView implements SurfaceHolder.Callb
 
         setWillNotDraw(false);
 
-        marginTop = marginBottom = marginLeft = marginRight = 30;
+        marginTop = 60;
+        marginBottom = marginLeft = marginRight = 30;
 
         scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
     }
@@ -183,7 +184,7 @@ public class OscilloscopeView extends SurfaceView implements SurfaceHolder.Callb
         }
 
         // label (legend)
-        drawText(dataSet.label, canvasWidth / 2, 10, canvas, paintText, DRAW_TEXT_ALIGN_TOP);
+        drawText(dataSet.label, canvasWidth / 2, 10, canvas, paintText, DRAW_TEXT_ALIGN_TOP | DRAW_TEXT_ALIGN_CENTER_HORIZONTAL);
     }
 
     private void drawCurve(Canvas canvas) {
@@ -240,7 +241,7 @@ public class OscilloscopeView extends SurfaceView implements SurfaceHolder.Callb
     public static final int DRAW_TEXT_ALIGN_RIGHT = 2;
     public static final int DRAW_TEXT_ALIGN_TOP = 4;
     public static final int DRAW_TEXT_ALIGN_BOTTOM = 8;
-//    public static final int DRAW_TEXT_ALIGN_CENTER_HORIZONTAL = 16;
+    public static final int DRAW_TEXT_ALIGN_CENTER_HORIZONTAL = 16;
     public static final int DRAW_TEXT_ALIGN_CENTER_VERTICAL = 32;
     private void drawText(String text, int cx, int cy, Canvas canvas, Paint paint) {
         drawText(text, cx, cy, canvas, paint, DRAW_TEXT_ALIGN_CENTER_VERTICAL);
@@ -252,12 +253,18 @@ public class OscilloscopeView extends SurfaceView implements SurfaceHolder.Callb
 
         if ((align & DRAW_TEXT_ALIGN_TOP) != 0) {
             y += textBounds.height();
-        } else if ((align & DRAW_TEXT_ALIGN_BOTTOM) != 0) {
+        }
+        if ((align & DRAW_TEXT_ALIGN_BOTTOM) != 0) {
 
-        } else if ((align & DRAW_TEXT_ALIGN_CENTER_VERTICAL) != 0) {
+        }
+        if ((align & DRAW_TEXT_ALIGN_CENTER_VERTICAL) != 0) {
             y -= textBounds.exactCenterY();
-        } else if ((align & DRAW_TEXT_ALIGN_RIGHT) != 0) {
+        }
+        if ((align & DRAW_TEXT_ALIGN_RIGHT) != 0) {
             x -= textBounds.width();
+        }
+        if ((align & DRAW_TEXT_ALIGN_CENTER_HORIZONTAL) != 0) {
+            x -= textBounds.exactCenterX();
         }
 
         canvas.drawText(text, x, y, paint);

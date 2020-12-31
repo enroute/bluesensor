@@ -168,8 +168,14 @@ public class StatusFragment extends Fragment {
 
                 // 循环遍历特征集合
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                    if (gattCharacteristic.getUuid().toString().equals(BleEngine.HEART_RATE_MEASUREMENT)) {
-                        appendStatus("\n" + gattCharacteristic.getUuid());
+//                    if (gattCharacteristic.getUuid().toString().equals(BleEngine.HEART_RATE_MEASUREMENT)) {
+//                        appendStatus("\n" + gattCharacteristic.getUuid());
+//                        ((BlueSensorApplication) requireActivity().getApplication()).getBleEngine()
+//                                .setCharacteristicNotification(gattCharacteristic);
+//                    }
+                    int property = gattCharacteristic.getProperties();
+                    if ((property & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                        appendStatus("\nnotifiable: " + gattCharacteristic.getUuid());
                         ((BlueSensorApplication) requireActivity().getApplication()).getBleEngine()
                                 .setCharacteristicNotification(gattCharacteristic);
                     }

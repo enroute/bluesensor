@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">BlueSensor</string>
+    <string name="title_home">Home</string>
+    <string name="title_history">History</string>
+    <string name="title_device">Device</string>
+    <string name="discover">Discover</string>
+    <string name="searching">Searching</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_fullscreen_live">FullscreenLiveActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="device_icon_content_desciption">Device Icon</string>
+    <string name="connect">Connect</string>
+    <string name="not_bound">Not bound</string>
+    <string name="title_activity_connect">ConnectActivity</string>
+    <string name="connect_tab_status">Status</string>
+    <string name="connect_tab_service">Service</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

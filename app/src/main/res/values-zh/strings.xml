@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">智测</string>
+    <string name="title_home">实时</string>
+    <string name="title_history">历史</string>
+    <string name="title_device">设备</string>
+    <string name="discover">搜索</string>
+    <string name="searching">搜索中</string>
+    <string name="not_bound">Not bound</string>
+</resources>

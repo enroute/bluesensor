@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <color name="osciloDark">#1C1C1E</color>
+    <!--    <color name="osciloDim">#202122</color>-->
+    <color name="osciloDim">#292A2B</color>
+    <color name="osciloMajor">#9B9CA1</color>
+    <color name="osciloMinor">#222325</color>
+    <color name="osciloText">#91A6B6</color>
+    <color name="osciloFill">#70808A</color>
+    <color name="osciloLine">#DEC557</color>
+    <color name="black_overlay">#66000000</color>
+</resources>

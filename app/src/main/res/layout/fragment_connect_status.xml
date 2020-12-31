@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.device.DeviceFragment">
+
+    <TextView
+        android:id="@+id/connect_device_title"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="0dp"
+        android:textSize="16sp"
+        android:text="text_connect_device_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/connect_sv_status"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:textSize="8sp"
+        android:background="#AAAAAA"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/connect_device_title"
+        app:layout_constraintBottom_toTopOf="@id/space_after_status" >
+        <TextView
+            android:id="@+id/connect_tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textSize="10sp"
+        />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/connect_close_button"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_margin="10dp"
+        android:text="Close"
+        android:textColor="#ffffff"
+        android:background="@drawable/round_corner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_blank_fragment" />
+
+    <Space
+        android:id="@+id/space_after_status"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        app:layout_constraintBottom_toTopOf="@id/connect_close_button"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".FullscreenLiveActivity">
 
-    <com.ztfun.bluesensor.ui.OscilloscopeView
+    <com.ztfun.module.plot.ZtPlotView
         android:id="@+id/fullscreen_oscilloscope"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -121,7 +121,7 @@ public class JigProtocol {
         // byte 0 is sync, should be 0x0f, just ignore
         byte pecCrc = pec(data, 15);
         if (pecCrc != data[15]) {
-            Log.d(TAG, "wrong pec, expecting " + pecCrc + ", while got " + data[15] + " in data: " + data.toString());
+            //Log.d(TAG, "wrong pec, expecting " + pecCrc + ", while got " + data[15] + " in data: " + data.toString());
             return null;
         }
 

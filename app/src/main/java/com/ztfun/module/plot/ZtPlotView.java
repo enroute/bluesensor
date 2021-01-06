@@ -16,12 +16,40 @@ import com.ztfun.bluesensor.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
     public static final String TAG = ZtPlotView.class.getSimpleName();
 
     List<DataSet> dataSets;
+    List<String> xLabels;
+    DataRange xRange;
+
+    public static class DataRange {
+        public double min, max;
+        public double range;
+
+        public DataRange(double min, double max) {
+            this.min = min;
+            this.max = max;
+            range = max - min;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "(" + min + ", " + max + ")";
+        }
+    }
+
+    public void setXLabels(List<String> xLabels) {
+        this.xLabels = xLabels;
+    }
+
+    public void setDataRangeX(double min, double max) {
+        xRange = new DataRange(min, max);
+    }
 
     public static class ZtPlotOption {
         public Rect margin;
@@ -106,6 +134,7 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void addDataSet(DataSet dataSet) {
         dataSets.add(dataSet);
+        dataSet.setParent(this);
     }
 
     @Override
@@ -122,7 +151,7 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
                 option.margin.left + xMajorStep * option.xGrids,
                 option.margin.top + yMajorStep * option.yGrids);
 
-        Log.d(TAG, "dataRect=" + dataRect.toString());
+        //Log.d(TAG, "dataRect=" + dataRect.toString());
 
         drawGrids(canvas);
 
@@ -132,6 +161,8 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        drawXLabels(canvas);
 
         for(DataSet dataSet : dataSets) {
             drawDataSet(canvas, dataSet);
@@ -158,17 +189,28 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         for(int i = 0; i < dataSet.yTickLabels.size(); i ++) {
             drawText(canvas, dataSet.yTickLabels.get(i), cx, cy, paint, align);
             cy -= yMajorStep;
-            Log.d(TAG, "drawText " + dataSet.yTickLabels.get(i) + " on " + cx + " , " + cy);
+            //Log.d(TAG, "drawText " + dataSet.yTickLabels.get(i) + " on " + cx + " , " + cy);
         }
 
         // rotate to draw y labels
         Rect textBounds = new Rect();
         paint.getTextBounds(dataSet.label, 0, dataSet.label.length(), textBounds);
         cy = canvas.getHeight() / 2;
+
+        String text = dataSet.dataEntries.size() > 0 ?
+                String.format(Locale.CHINA, "%s: %.03f", dataSet.label,
+                        dataSet.dataEntries.get(dataSet.dataEntries.size() - 1).y) :
+                dataSet.label + ":";
         if (dataSet.option.dataSetType == DATA_SET_PRIMARY) {
             cx = extraMargin + textBounds.height();
+
+            // legend
+            drawText(canvas, text, dataRect.left + 20, dataRect.top - 10, paint, DRAW_TEXT_ALIGN_BOTTOM | DRAW_TEXT_ALIGN_LEFT);
         } else {
             cx = canvas.getWidth() - extraMargin;
+
+            // legend
+            drawText(canvas, text, dataRect.right - 20, dataRect.top - 10, paint, DRAW_TEXT_ALIGN_BOTTOM | DRAW_TEXT_ALIGN_RIGHT);
         }
 
         canvas.save();
@@ -177,7 +219,24 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         canvas.restore();
 
         // data lines
-        // todo;
+        int width = dataRect.right - dataRect.left;
+        int height = dataRect.bottom - dataRect.top;
+        if (dataSet.dataEntries.size() > 0) {
+            DataEntry entry = dataSet.dataEntries.get(0);
+            float cx0 = (float) (dataRect.left + (entry.x - xRange.min) / (xRange.range) * (width));
+            float cy0 = (float) (dataRect.bottom - (entry.y - dataSet.yRange.min) / (dataSet.yRange.range) * height);
+            for (int i = 1; i < dataSet.dataEntries.size(); i++) {
+                entry = dataSet.dataEntries.get(i);
+                cx = (float) (dataRect.left + (entry.x - xRange.min) / (xRange.range) * (width));
+                cy = (float) (dataRect.bottom - (entry.y - dataSet.yRange.min) / (dataSet.yRange.range) * height);
+                if (cx >= dataRect.left && cx <= dataRect.right && cy >= dataRect.top && cy <= dataRect.bottom) {
+                    canvas.drawCircle(cx, cy, 5, paint);
+                    canvas.drawLine(cx0, cy0, cx, cy, paint);
+                }
+                cx0 = cx;
+                cy0 = cy;
+            }
+        }
     }
 
     private void drawGrids(Canvas canvas) {
@@ -196,6 +255,20 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i <= option.yGrids; i++) {
             y = dataRect.top + yMajorStep * i;
             canvas.drawLine(dataRect.left, y, dataRect.right, y, paint);
+        }
+    }
+
+    private void drawXLabels(Canvas canvas) {
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.parseColor("#FFFFFF"));
+        paint.setTextSize(getResources().getDimensionPixelSize(R.dimen.oscillo_text_size));
+        int extraMargin = 5;
+        float cx;
+        float cy = dataRect.bottom + extraMargin;
+        int align = DRAW_TEXT_ALIGN_TOP | DRAW_TEXT_ALIGN_CENTER_HORIZONTAL;
+        for (int i = 0; i <= option.xGrids; i++) {
+            cx = dataRect.left + xMajorStep * i;
+            drawText(canvas, xLabels.get(i), cx, cy, paint, align);
         }
     }
 
@@ -266,6 +339,12 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
             this.x = x;
             this.y = y;
         }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
     }
 
     public static class DataSet {
@@ -274,6 +353,12 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
 
         public List<String> yTickLabels;
         public List<DataEntry> dataEntries;
+        public DataRange yRange;
+        ZtPlotView parent;
+
+        public void setParent(ZtPlotView parent) {
+            this.parent = parent;
+        }
 
         public DataSetOption getOption() {
             return option;
@@ -287,10 +372,15 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         public DataSet(String label) {
             this.label = label;
             option = new DataSetOption();
+            dataEntries = new ArrayList<>();
         }
 
         public void addDataEntry(DataEntry entry) {
+            // Log.d(TAG, "add" + entry + ", " + parent.xRange);
             dataEntries.add(entry);
+            if (parent != null) {
+                parent.invalidate();
+            }
         }
 
         public void addDataEntry(double x, double y) {
@@ -303,6 +393,10 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
 
         public void setYTickLabels(List<String> yTickLabels) {
             this.yTickLabels = yTickLabels;
+        }
+
+        public void setDataRange(double min, double max) {
+            yRange = new DataRange(min, max);
         }
     }
 }

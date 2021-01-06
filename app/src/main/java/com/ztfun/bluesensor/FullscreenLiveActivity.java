@@ -18,14 +18,17 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class FullscreenLiveActivity extends AppCompatActivity {
     public static final String INTENT_EXTRA_DATA = "intent.extra.data.type";
     // corresponds to index of SharedViewModel.DATA_SET_LABEL
 
 
-    private int dataType;
+//    private int dataType;
     private ZtPlotView.DataSet voltDataSet, currDataSet;
+    private ZtPlotView.DataRange xRange;
+    ZtPlotView ztPlotView;
 
 //    OscilloscopeView.DataSet dataSet;
     @Override
@@ -33,18 +36,19 @@ public class FullscreenLiveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_live);
 
-        dataType = getIntent().getIntExtra(INTENT_EXTRA_DATA, 0);
+//        dataType = getIntent().getIntExtra(INTENT_EXTRA_DATA, 0);
 //        dataSet = new OscilloscopeView.DataSet(SharedViewModel.DATA_SET_LABEL[dataType]);
 //        oscilloscopeView.registerData(dataSet);
 
-        voltDataSet = new ZtPlotView.DataSet("Volt(mv)");
+        voltDataSet = new ZtPlotView.DataSet("Volt(V)");
         List<String> voltLabels = new ArrayList<>();
         for(String label : new String[] {"0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20"}) {
             voltLabels.add(label);
         }
         voltDataSet.setYTickLabels(voltLabels);
+        voltDataSet.setDataRange(0, 20);
 
-        currDataSet = new ZtPlotView.DataSet("Curr(mA)");
+        currDataSet = new ZtPlotView.DataSet("Curr(A)");
         ZtPlotView.DataSetOption currOption = new ZtPlotView.DataSetOption();
         currOption.dataSetType = ZtPlotView.DATA_SET_SECONDARY;
         currOption.paintColor = Color.parseColor("#00FFFF");
@@ -54,10 +58,25 @@ public class FullscreenLiveActivity extends AppCompatActivity {
             currLabels.add(label);
         }
         currDataSet.setYTickLabels(currLabels);
+        currDataSet.setDataRange(0, 2.0);
+//        currDataSet.addDataEntry(0, 0.2);
+//        currDataSet.addDataEntry(60000, 0.4);
+//        currDataSet.addDataEntry(120000, 0.8);
+//        currDataSet.addDataEntry(600000, 1.5);
 
-        ZtPlotView ztPlotView = findViewById(R.id.fullscreen_oscilloscope);
+
+        ztPlotView = findViewById(R.id.fullscreen_oscilloscope);
         ztPlotView.addDataSet(voltDataSet);
         ztPlotView.addDataSet(currDataSet);
+        List<String> timeLabels = new ArrayList<>();
+        for (String label : new String[] {
+                "00:00", "01:00", "02:00", "03:00", "04:00", "05:00",
+                "06:00", "07:00", "08:00", "09:00", "10:00"}) {
+            timeLabels.add(label);
+        }
+        ztPlotView.setXLabels(timeLabels);
+        xRange = new ZtPlotView.DataRange(0.0, 600000.0);
+        ztPlotView.setDataRangeX(xRange.min, xRange.max);  // milisec, 10min = 600 * 1000
     }
 
     Thread dataWorker;
@@ -83,22 +102,50 @@ public class FullscreenLiveActivity extends AppCompatActivity {
         handleReadValue(event.characteristic.getValue());
     }
 
+    private String formatMillisecond(double millisecond) {
+        // to hh:mm:ss
+        int secs = (int) (millisecond / 1000);
+        int hh = secs / (60 * 60);
+        int mm = (secs - hh * (60 * 60)) / 60;
+        int ss = (secs - hh * (60 * 60) - mm * 60);
+        return hh > 0 ? String.format(Locale.CHINA, "%02d:%02d:%02d", hh, mm ,ss) :
+                String.format(Locale.CHINA, "%02d:%02d", mm ,ss);
+    }
+
+    private List<String> getTimeLabels() {
+        List<String> timeLabels = new ArrayList<>();
+        for (int i = 0; i <= 10; i++) {
+            timeLabels.add(formatMillisecond(xRange.min + i * 60000));
+        }
+        return timeLabels;
+    }
+
     private void handleReadValue(byte[] data) {
         JigProtocol.JigPackage jigPackage = JigProtocol.parse(data);
         if (jigPackage != null) {
-            switch(dataType) {
-                case SharedViewModel.INTENT_DATA_CURR:
+//            switch(dataType) {
+//                case SharedViewModel.INTENT_DATA_CURR:
 //                    dataSet.addEntry(jigPackage.time / 100, jigPackage.curr);
-                    break;
-                case SharedViewModel.INTENT_DATA_VOLT:
+                    if (jigPackage.time > xRange.max) {
+                        // + 10 min
+                        int scale = (int)(Math.ceil((jigPackage.time - xRange.max) / 1000));
+                        xRange.min += 1000.0 * scale;
+                        xRange.max += 1000.0 * scale;
+                        ztPlotView.setDataRangeX(xRange.min, xRange.max);
+                        ztPlotView.setXLabels(getTimeLabels());
+                    }
+                    currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
+//                    break;
+//                case SharedViewModel.INTENT_DATA_VOLT:
 //                    dataSet.addEntry(jigPackage.time / 100, jigPackage.volt);
-                    break;
-                case SharedViewModel.INTENT_DATA_TEMP:
-//                    dataSet.addEntry(jigPackage.time / 100, jigPackage.temp);
-                    break;
-                default:
-                    break;
-            }
+                    voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
+//                    break;
+//                case SharedViewModel.INTENT_DATA_TEMP:
+////                    dataSet.addEntry(jigPackage.time / 100, jigPackage.temp);
+//                    break;
+//                default:
+//                    break;
+//            }
         }
     }
 }

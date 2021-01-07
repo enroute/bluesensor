@@ -32,6 +32,22 @@ public class JigProtocol {
     public static final int MODE_10W = 0x02;
     public static final int MODE_15W = 0x03;
 
+    public static final String[] MODE_LABEL = new String[] {
+            "5W", "7.5W", "10W", "15W"
+    };
+
+    public static final int[] MODES = new int[] {
+            MODE_5W, MODE_75W, MODE_10W, MODE_15W
+    };
+
+    public static final String getModeLabel(int mode) {
+        if (mode < MODE_LABEL.length && mode >= 0) {
+            return MODE_LABEL[mode];
+        } else {
+            return "N/A";
+        }
+    }
+
     public static final int CMD_SWITCH_TO_5W = 0x01;
     public static final int CMD_SWITCH_TO_75W = 0x02;
     public static final int CMD_SWITCH_TO_10W = 0x03;
@@ -108,7 +124,7 @@ public class JigProtocol {
         }
     }
 
-    private static String bytes2String(byte[] data) {
+    public static String bytes2String(byte[] data) {
         StringBuilder sb = new StringBuilder();
         for (byte b : data) {
             sb.append(Util.byte2Hex(b));
@@ -118,6 +134,13 @@ public class JigProtocol {
     }
 
     public static JigPackage parse(byte[] data) {
+        if (data == null) {// || data.length != 16) {
+            Log.d(TAG, "data is null");
+            return null;
+        } else if (data.length != 16) {
+            Log.e(TAG, "data.length=" + data.length + ", " + bytes2String(data));
+            return null;
+        }
         // byte 0 is sync, should be 0x0f, just ignore
         byte pecCrc = pec(data, 15);
         if (pecCrc != data[15]) {
@@ -149,7 +172,7 @@ public class JigProtocol {
         jigPackage.mode = mode;
         jigPackage.pec = pec;
 
-        Log.d(TAG, "data:" + bytes2String(data) + ", Package: " + jigPackage.toString());
+        //Log.d(TAG, "data:" + bytes2String(data) + ", Package: " + jigPackage.toString());
         return jigPackage;
     }
 

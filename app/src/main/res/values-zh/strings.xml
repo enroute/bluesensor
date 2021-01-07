@@ -5,5 +5,13 @@
     <string name="title_device">设备</string>
     <string name="discover">搜索</string>
     <string name="searching">搜索中</string>
-    <string name="not_bound">Not bound</string>
+    <string name="not_bound">未配对</string>
+    <string name="title_activity_connect">ConnectActivity</string>
+    <string name="connect_tab_status">状态</string>
+    <string name="connect_tab_service">服务</string>
+    <string name="address">地址</string>
+    <string name="mode">模式</string>
+    <string name="temp">温度(℃)</string>
+    <string name="freq">频度(KHz)</string>
+    <string name="change_mode">改变模式</string>
 </resources>

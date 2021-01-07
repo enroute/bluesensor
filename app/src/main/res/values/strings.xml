@@ -21,4 +21,9 @@
     <string name="connect_tab_service">Service</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="address">Address</string>
+    <string name="mode">Mode</string>
+    <string name="temp">Temp(℃)</string>
+    <string name="freq">Freq(KHz)</string>
+    <string name="change_mode">Change Mode</string>
 </resources>

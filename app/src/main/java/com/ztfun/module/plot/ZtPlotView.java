@@ -259,6 +259,10 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void drawXLabels(Canvas canvas) {
+        if (xLabels == null || xLabels.size() <= 0) {
+            return;
+        }
+
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.parseColor("#FFFFFF"));
         paint.setTextSize(getResources().getDimensionPixelSize(R.dimen.oscillo_text_size));

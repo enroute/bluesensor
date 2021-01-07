@@ -179,6 +179,12 @@ public class StatusFragment extends Fragment {
                         ((BlueSensorApplication) requireActivity().getApplication()).getBleEngine()
                                 .setCharacteristicNotification(gattCharacteristic);
                     }
+
+                    if ((property & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 ||
+                            (property & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0 ) {
+                        ((BlueSensorApplication) requireActivity().getApplication()).getBleEngine()
+                                .setWriteCharacteristic(gattCharacteristic);
+                    }
                 }
             }
         } else {

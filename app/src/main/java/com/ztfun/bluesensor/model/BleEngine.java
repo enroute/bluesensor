@@ -40,7 +40,7 @@ public class BleEngine {
     //public static final UUID BT_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     // GATT service UUID
-    //public static String HEART_RATE_MEASUREMENT = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    public static String HEART_RATE_MEASUREMENT = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
     private Context context;
     private Handler handler;
@@ -142,6 +142,7 @@ public class BleEngine {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
+            Log.d(TAG, "onCharacteristicWrite: " + status);
         }
 
         @Override
@@ -149,7 +150,7 @@ public class BleEngine {
             super.onCharacteristicChanged(gatt, characteristic);
             // post event
             EventBus.getDefault().post(new CharacteristicChangedEvent(characteristic));
-            Log.d(TAG, "characteristic changed:" + characteristic.getValue().toString());
+            // Log.d(TAG, "characteristic changed:" + characteristic.getValue().toString());
         }
 
         @Override
@@ -180,8 +181,17 @@ public class BleEngine {
         }
     };
 
+    public String getCurrentRemoteAddress() {
+        return bluetoothDeviceAddress;
+    }
+
+    public String getCurrentRemoteName() {
+        return bluetoothDeviceName;
+    }
+
     private BluetoothGatt bluetoothGatt = null;
     private String bluetoothDeviceAddress = null;
+    private String bluetoothDeviceName = null;
     public static final int CONNECTION_STATE_IDLE = 0;
     public static final int CONNECTION_STATE_CONNECTING = 1;
     public static final int CONNECTION_STATE_CONNECTED = 2;
@@ -208,6 +218,8 @@ public class BleEngine {
             Log.d(TAG, "Device " + address + "not found. Unable to connect.");
             return false;
         }
+
+        bluetoothDeviceName = device.getName();
 
         bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback);
         bluetoothDeviceAddress = address;
@@ -262,6 +274,8 @@ public class BleEngine {
         }
     }
 
+    BluetoothGattCharacteristic writeCharacteristic = null;
+    BluetoothGattService writeService = null;
     public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic) {
         if (bluetoothGatt.setCharacteristicNotification(characteristic, true)) {
             Log.d(TAG, "Setting setCharacteristicNotification for characteristic: " + characteristic.getUuid());
@@ -275,12 +289,53 @@ public class BleEngine {
                     bluetoothGatt.writeDescriptor(descriptor);
                 }
             }
+
+            Log.d(TAG, "setCharacteristicNotification: " + characteristic.getUuid());
+//            if (characteristic.getUuid().toString().equals(HEART_RATE_MEASUREMENT)) {
+//                // save to write characteristic
+//                writeCharacteristic = characteristic;
+//                writeService = characteristic.getService();
+//            }
         } else {
             Log.d(TAG, "fail to setCharacteristicNotification");
         }
     }
 
+    public void write(byte[] data) {
+        if (writeCharacteristic == null) {
+            Log.d(TAG, "writeCharacteristic is null");
+            return;
+        }
+
+        Log.d(TAG, "Writing " + JigProtocol.bytes2String(data));
+        writeCharacteristic.setValue(data);
+        boolean result = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+    }
+
     public List<BluetoothGattService> getGattServices() {
         return bluetoothGatt.getServices();
+    }
+
+    public void setWriteCharacteristic(BluetoothGattCharacteristic gattCharacteristic) {
+        // todo: which characteristic is?
+        // 00002a02-0000-1000-8000-00805f9b34fb
+        // 00002a03-0000-1000-8000-00805f9b34fb
+        // 0000fff1-0000-1000-8000-00805f9b34fb
+        // 0000fff3-0000-1000-8000-00805f9b34fb
+        // 0000fff5-0000-1000-8000-00805f9b34fb
+        // 0000ffe1-0000-1000-8000-00805f9b34fb
+        if (gattCharacteristic == null) {
+            return;
+        }
+
+        String uuid = gattCharacteristic.getUuid().toString();
+        if (uuid == null) {
+            return;
+        }
+
+        if (uuid.equals("0000fff3-0000-1000-8000-00805f9b34fb")) {
+            writeCharacteristic = gattCharacteristic;
+        }
+        Log.d(TAG, "Writable characteristic: "  + gattCharacteristic.getUuid().toString());
     }
 }

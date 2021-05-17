@@ -236,7 +236,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 new String[] {address},
                 null,
                 null,
-                null,
+                DataEntry.COLUMN_NAME_TIME,
                 null);
         List<JigProtocol.JigPackage> data = new ArrayList<>();
         while(cursor.moveToNext()) {

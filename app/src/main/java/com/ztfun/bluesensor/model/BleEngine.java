@@ -190,7 +190,12 @@ public class BleEngine {
     }
 
     private BluetoothGatt bluetoothGatt = null;
+
     private String bluetoothDeviceAddress = null;
+    public String getBluetoothDeviceAddress() {
+        return bluetoothDeviceAddress;
+    }
+
     private String bluetoothDeviceName = null;
     public static final int CONNECTION_STATE_IDLE = 0;
     public static final int CONNECTION_STATE_CONNECTING = 1;
@@ -333,8 +338,9 @@ public class BleEngine {
             return;
         }
 
-        if (uuid.equals("0000fff3-0000-1000-8000-00805f9b34fb")) {
+        if (uuid.equals("0000ffe1-0000-1000-8000-00805f9b34fb")) {
             writeCharacteristic = gattCharacteristic;
+            Log.d(TAG, "Setting write chara to " + uuid.toString());
         }
         Log.d(TAG, "Writable characteristic: "  + gattCharacteristic.getUuid().toString());
     }

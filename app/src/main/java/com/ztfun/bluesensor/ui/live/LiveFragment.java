@@ -227,14 +227,15 @@ public class LiveFragment extends Fragment {
             tvTemp.setText("" + jigPackage.temp);
             tvFreq.setText("" + jigPackage.freq);
 
-            if (jigPackage.time > xRange.max) {
-                // + 10 min
-                int scale = (int)(Math.ceil((jigPackage.time - xRange.max) / 1000));
-                xRange.min += 1000.0 * scale;
-                xRange.max += 1000.0 * scale;
-                ztPlotView.setDataRangeX(xRange.min, xRange.max);
-                //ztPlotView.setXLabels(getTimeLabels());
-            }
+//            if (jigPackage.time > xRange.max) {
+//                // + 10 min
+//                int scale = (int)(Math.ceil((jigPackage.time - xRange.max) / 1000));
+//                xRange.min += 1000.0 * scale;
+//                xRange.max += 1000.0 * scale;
+//                ztPlotView.setDataRangeX(xRange.min, xRange.max);
+//                //ztPlotView.setXLabels(getTimeLabels());
+//            }
+
             //currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
             //voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
             ztPlotView.addData(currDataSet, jigPackage.curr / 1000.0, voltDataSet, jigPackage.volt / 1000.0);

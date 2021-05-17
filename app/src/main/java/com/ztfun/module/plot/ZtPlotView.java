@@ -26,6 +26,11 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
     List<String> xLabels;
     DataRange xRange;
 
+    private int zoomScalar = 1;
+    private static final int ZOOM_SCALAR_BASE = 16;
+    private static final int ZOOM_SCALAR_MIN = 1;
+    private static final int ZOOM_SCALAR_MAX = 128;
+
     public static class DataRange {
         public double min, max;
         public double range;
@@ -43,7 +48,36 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void zoomIn() {
+        setZoomScaled(zoomScalar * 2);
+    }
+
+    public void zoomOut() {
+        setZoomScaled(zoomScalar / 2);
+    }
+
+    public void zoomDefault() {
+        setZoomScaled(ZOOM_SCALAR_BASE);
+    }
+
+    public boolean canZoomIn() {
+        return zoomScalar < ZOOM_SCALAR_MAX;
+    }
+
+    public boolean canZoomOut() {
+        return zoomScalar > ZOOM_SCALAR_MIN;
+    }
+
+    private void setZoomScaled(int zoomScalar) {
+        if (zoomScalar <= ZOOM_SCALAR_MAX && zoomScalar >= ZOOM_SCALAR_MIN) {
+            this.zoomScalar = zoomScalar;
+        } else {
+            // out of limit
+        }
+    }
+
     public void addData(DataSet dataSetCurrent, double current, DataSet dataSetVolt, double volt) {
+        xRange.min += 1;
         xRange.max += 1;
         dataSetCurrent.addDataEntry(xRange.max, current);
         dataSetVolt.addDataEntry(xRange.max, volt);

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.ztfun.bluesensor.events.CharacteristicChangedEvent;
 import com.ztfun.bluesensor.events.CharacteristicReadEvent;
@@ -82,6 +83,26 @@ public class FullscreenLiveActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
+
+        initDataFromDb();
+    }
+
+    private void initDataFromDb() {
+        BlueSensorApplication application = ((BlueSensorApplication)getApplication());
+        DbHelper dbHelper = application.getDbHelper();
+        String address = application.getBleEngine().getCurrentRemoteAddress();
+        if (address == null) {
+            return;
+        }
+        List<JigProtocol.JigPackage> data = dbHelper.getDataByAddress(address);
+        Log.d("DBVVV:", data == null ? "No data" : "GET DATA COUNT: " + data.size());
+
+        // clear and then add to dataset
+        currDataSet.dataEntries.clear();
+        voltDataSet.dataEntries.clear();
+        for (JigProtocol.JigPackage jigPackage : data) {
+            ztPlotView.addData(currDataSet, jigPackage.curr / 1000.0, voltDataSet, jigPackage.volt / 1000.0);
+        }
     }
 
     @Override
@@ -121,22 +142,24 @@ public class FullscreenLiveActivity extends AppCompatActivity {
     private void handleReadValue(byte[] data) {
         JigProtocol.JigPackage jigPackage = JigProtocol.parse(data);
         if (jigPackage != null) {
+            ztPlotView.addData(currDataSet, jigPackage.curr / 1000.0, voltDataSet, jigPackage.volt / 1000.0);
 //            switch(dataType) {
 //                case SharedViewModel.INTENT_DATA_CURR:
 //                    dataSet.addEntry(jigPackage.time / 100, jigPackage.curr);
-                    if (jigPackage.time > xRange.max) {
-                        // + 10 min
-                        int scale = (int)(Math.ceil((jigPackage.time - xRange.max) / 1000));
-                        xRange.min += 1000.0 * scale;
-                        xRange.max += 1000.0 * scale;
-                        ztPlotView.setDataRangeX(xRange.min, xRange.max);
-                        //ztPlotView.setXLabels(getTimeLabels());
-                    }
-                    currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
+//                    if (jigPackage.time > xRange.max) {
+//                        // + 10 min
+//                        int scale = (int)(Math.ceil((jigPackage.time - xRange.max) / 1000));
+//                        xRange.min += 1000.0 * scale;
+//                        xRange.max += 1000.0 * scale;
+//                        ztPlotView.setDataRangeX(xRange.min, xRange.max);
+//                        //ztPlotView.setXLabels(getTimeLabels());
+//                    }
+                    //currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
 //                    break;
 //                case SharedViewModel.INTENT_DATA_VOLT:
 //                    dataSet.addEntry(jigPackage.time / 100, jigPackage.volt);
-                    voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
+                    //voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
+
 //                    break;
 //                case SharedViewModel.INTENT_DATA_TEMP:
 ////                    dataSet.addEntry(jigPackage.time / 100, jigPackage.temp);

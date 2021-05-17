@@ -8,6 +8,7 @@ import com.ztfun.bluesensor.model.BlueBleService;
 
 public class BlueSensorApplication extends Application {
     private BleEngine bleEngine;
+    private DbHelper dbHelper;
 
     @Override
     public void onCreate() {
@@ -21,6 +22,13 @@ public class BlueSensorApplication extends Application {
         }
 
         return bleEngine;
+    }
+
+    public DbHelper getDbHelper() {
+        if (dbHelper == null) {
+            dbHelper = new DbHelper(getApplicationContext());
+        }
+        return dbHelper;
     }
 
     private BlueBleService bleService = null;

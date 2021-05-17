@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,12 +69,9 @@ public class FullscreenLiveActivity extends AppCompatActivity {
         ztPlotView = findViewById(R.id.fullscreen_oscilloscope);
         ztPlotView.addDataSet(voltDataSet);
         ztPlotView.addDataSet(currDataSet);
-        List<String> timeLabels = new ArrayList<>();
-        for (String label : new String[] {
-                "00:00", "01:00", "02:00", "03:00", "04:00", "05:00",
-                "06:00", "07:00", "08:00", "09:00", "10:00"}) {
-            timeLabels.add(label);
-        }
+        // set fixed time labels
+        List<String> timeLabels = new ArrayList<>(Arrays.asList(
+                "5m", "4m30s", "4m", "3m30s", "3m", "2m30s", "2m", "1m30s", "1m", "30s", "0s"));
         ztPlotView.setXLabels(timeLabels);
         xRange = new ZtPlotView.DataRange(0.0, 600000.0);
         ztPlotView.setDataRangeX(xRange.min, xRange.max);  // milisec, 10min = 600 * 1000
@@ -132,7 +130,7 @@ public class FullscreenLiveActivity extends AppCompatActivity {
                         xRange.min += 1000.0 * scale;
                         xRange.max += 1000.0 * scale;
                         ztPlotView.setDataRangeX(xRange.min, xRange.max);
-                        ztPlotView.setXLabels(getTimeLabels());
+                        //ztPlotView.setXLabels(getTimeLabels());
                     }
                     currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
 //                    break;

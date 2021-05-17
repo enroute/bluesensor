@@ -112,10 +112,10 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     public class Device {
-        int _id;
-        String address;
-        String name;
-        String note;
+        public int _id;
+        public String address;
+        public String name;
+        public String note;
 
         public Device(int _id, String address, String name, String note) {
             this._id = _id;

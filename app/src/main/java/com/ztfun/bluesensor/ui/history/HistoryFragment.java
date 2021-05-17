@@ -60,11 +60,15 @@ public class HistoryFragment extends Fragment {
     }
 
     private void updatePairedDevices() {
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        boundDeviceList.clear();
-        for (BluetoothDevice device : pairedDevices) {
-            boundDeviceList.add(device.getName() + "\n" + device.getAddress());
+        DbHelper dbHelper = new DbHelper(requireContext());
+        for (DbHelper.Device device : dbHelper.getDevices()) {
+            boundDeviceList.add(device.name + "\n" + device.address);
         }
+//        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//        boundDeviceList.clear();
+//        for (BluetoothDevice device : pairedDevices) {
+//            boundDeviceList.add(device.getName() + "\n" + device.getAddress());
+//        }
         boundDeviceListViewAdapter.notifyDataSetChanged();
     }
 

@@ -43,6 +43,12 @@ public class ZtPlotView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void addData(DataSet dataSetCurrent, double current, DataSet dataSetVolt, double volt) {
+        xRange.max += 1;
+        dataSetCurrent.addDataEntry(xRange.max, current);
+        dataSetVolt.addDataEntry(xRange.max, volt);
+    }
+
     public void setXLabels(List<String> xLabels) {
         this.xLabels = xLabels;
     }

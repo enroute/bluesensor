@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ztfun.bluesensor.BlueSensorApplication;
+import com.ztfun.bluesensor.DbHelper;
 import com.ztfun.bluesensor.FullscreenLiveActivity;
 import com.ztfun.bluesensor.MainActivity;
 import com.ztfun.bluesensor.R;
@@ -233,8 +235,9 @@ public class LiveFragment extends Fragment {
                 ztPlotView.setDataRangeX(xRange.min, xRange.max);
                 //ztPlotView.setXLabels(getTimeLabels());
             }
-            currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
-            voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
+            //currDataSet.addDataEntry(jigPackage.time, jigPackage.curr / 1000.0);
+            //voltDataSet.addDataEntry(jigPackage.time, jigPackage.volt / 1000.0);
+            ztPlotView.addData(currDataSet, jigPackage.curr / 1000.0, voltDataSet, jigPackage.volt / 1000.0);
         }
     }
 
@@ -244,6 +247,26 @@ public class LiveFragment extends Fragment {
 
         tvDeviceName.setText(bleEngine.getCurrentRemoteName());
         tvDeviceAddress.setText(bleEngine.getCurrentRemoteAddress());
+        
+        initDataFromDb();
+    }
+
+    private void initDataFromDb() {
+        BlueSensorApplication application = ((BlueSensorApplication)getActivity().getApplication());
+        DbHelper dbHelper = application.getDbHelper();
+        String address = application.getBleEngine().getCurrentRemoteAddress();
+        if (address == null) {
+            return;
+        }
+        List<JigProtocol.JigPackage> data = dbHelper.getDataByAddress(address);
+        Log.d("DBVVV:", data == null ? "No data" : "GET DATA COUNT: " + data.size());
+
+        // clear and then add to dataset
+        currDataSet.dataEntries.clear();
+        voltDataSet.dataEntries.clear();
+        for (JigProtocol.JigPackage jigPackage : data) {
+            ztPlotView.addData(currDataSet, jigPackage.curr / 1000.0, voltDataSet, jigPackage.volt / 1000.0);
+        }
     }
 
     @Override
